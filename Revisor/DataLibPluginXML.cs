@@ -161,6 +161,14 @@ namespace BarcodeFramework
     {
       throw new NotImplementedException();
     }
+    public void SaveLog(ref ScanLog slog)
+    {
+      throw new NotImplementedException();
+    }
+    public IEnumerable<ScanLog> GetAllScansLog()
+    {
+      throw new NotImplementedException();
+    }
     #endregion
   }
 }

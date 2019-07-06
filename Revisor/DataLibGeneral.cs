@@ -53,7 +53,20 @@ namespace BarcodeFramework
         return true;
       }
     }
-
+    private string CurrentDateSQLStr
+    {
+      get
+      {
+        DateTime dt = DateTime.Now;
+        return string.Format("{0}-{1}-{2} {3}:{4}:{5}",
+                      dt.Year.ToString(),
+                      dt.Month.ToString("00"),
+                      dt.Day.ToString("00"),
+                      dt.Hour.ToString("00"),
+                      dt.Minute.ToString("00"),
+                      dt.Second.ToString("00"));
+      }
+    }
     private bool ConnectDatabaseTry()
     {
       try
@@ -85,12 +98,50 @@ namespace BarcodeFramework
       get { return active; }
       set { active = value; }
     }
-
+    //сохраняет лог
+    public void SaveLog(ref ScanLog slog)
+    {
+      string insertCommandText = @" INSERT INTO ScanLog(ArtCode, id_gamma, Dt, Qty, Barcode, ActionType) 
+VALUES(@artcode, @id_gamma, @Dt, @Qty, @Barcode, @ActionType) ";
+      using (SqlCeConnection connect = new SqlCeConnection(Datasource))
+      {
+        connect.Open();
+        SqlCeTransaction tx = connect.BeginTransaction();
+        SqlCeCommand command = connect.CreateCommand();
+        command.CommandText = insertCommandText;
+        command.Parameters.Add("artcode", SqlDbType.Int).Value = slog.ArtCode;
+        command.Parameters.Add("id_gamma", SqlDbType.Int).Value = GlobalArea.CurrentEmployee.GammaID;
+        command.Parameters.Add("Dt", SqlDbType.NVarChar).Value = GlobalArea.CurrentDateSQLStr;
+        command.Parameters.Add("Qty", SqlDbType.Int).Value = slog.Qty;
+        command.Parameters.Add("Barcode", SqlDbType.NVarChar).Value = slog.Barcode;
+        command.Parameters.Add("ActionType", SqlDbType.Int).Value = (int)slog.ActType;        
+        command.Transaction = tx;
+        try
+        {
+          int rowsAffected = command.ExecuteNonQuery();          
+          tx.Commit();
+        }
+        catch (Exception e)
+        {
+          MessageBox.Show(e.Message);
+          tx.Rollback();
+        }
+      }
+    }
     
     //сохраняет одну сканированную запись в БД
     public OrderItem Save(ref OrderItem orderItem) 
     {
       int updateCount = UpdateScan(orderItem.Scan);
+      if (updateCount > 0)
+      try
+      {
+        var slog = orderItem.ScanLog;
+        if (slog != null)
+          SaveLog(ref slog);
+      }
+      catch (Exception)
+      { }
       return GetOrderItemByEan(orderItem.Ean);
     }
     // возвращает сканированный товар и количество по арткоду
@@ -108,6 +159,8 @@ namespace BarcodeFramework
 
     public OrderItem GetOrdeItemByBarcode(string barcode)
     {
+      if (barcode.Length == 0)
+        return null;
       Ean ean = GetEan(barcode);
       return (ean != null)?GetOrderItemByEan(ean) : null;
     }
@@ -146,19 +199,19 @@ namespace BarcodeFramework
     public OrderItem CreateOrderItem(Ean ean)
     {
       OrderItem orderItem = null;
-      string insertCommandText = @" INSERT INTO scan(ArtCode, id_gamma, Qty, Dt) VALUES(@artcode, @id_gamma, @qty, GETDATE()) ";
+      string insertCommandText = @" INSERT INTO scan(ArtCode, id_gamma, Qty, Dt, StartDt, EndDt) 
+VALUES(@artcode, @id_gamma, @qty, GETDATE(), @StartDt, @EndDt) ";
       using (SqlCeConnection connect = new SqlCeConnection(Datasource))
       {
         connect.Open();
         SqlCeTransaction tx = connect.BeginTransaction();
         SqlCeCommand command = connect.CreateCommand();
         command.CommandText = insertCommandText;
-        var param = command.Parameters.Add("artcode", SqlDbType.Int);
-        param.Value = ean.ArtCode;
-        param = command.Parameters.Add("id_gamma", SqlDbType.Int);
-        param.Value = GlobalArea.CurrentEmployee.GammaID;
-        param = command.Parameters.Add("qty", SqlDbType.Int);
-        param.Value = 0;
+        command.Parameters.Add("artcode", SqlDbType.Int).Value = ean.ArtCode;
+        command.Parameters.Add("id_gamma", SqlDbType.Int).Value = GlobalArea.CurrentEmployee.GammaID;
+        command.Parameters.Add("qty", SqlDbType.Int).Value = 0;
+        command.Parameters.Add("StartDt", SqlDbType.NVarChar).Value = CurrentDateSQLStr;
+        command.Parameters.Add("EndDt", SqlDbType.NVarChar).Value = CurrentDateSQLStr;
         command.Transaction = tx;
         try
         {
@@ -166,11 +219,17 @@ namespace BarcodeFramework
           tx.Commit();
           orderItem = GetOrderItemByEan(ean);
         }
-        catch (Exception)
+        catch (Exception e)
         {
+          MessageBox.Show(e.Message);
           tx.Rollback();
           orderItem = null;
         }
+      }
+      if (orderItem != null)
+      {
+        var slog = orderItem.ScanLog;
+        SaveLog(ref slog);
       }
       return orderItem;
     }
@@ -185,7 +244,7 @@ namespace BarcodeFramework
     // обновляет orderItem | возвращает количество затронутіх записей
     public int UpdateScan(Scan scan)
     {      
-      string updateCommandText = @" UPDATE scan SET Qty = @qty, dt = GETDATE() WHERE ArtCode = @artcode and id_gamma = @id_gamma ";
+      string updateCommandText = @" UPDATE scan SET Qty = @qty, EndDt = @EndDt WHERE ArtCode = @artcode and id_gamma = @id_gamma ";
       int rowsAffected = 0;
       using (SqlCeConnection connect = new SqlCeConnection(Datasource))
       {
@@ -193,12 +252,10 @@ namespace BarcodeFramework
         SqlCeTransaction tx = connect.BeginTransaction();
         SqlCeCommand command = connect.CreateCommand();
         command.CommandText = updateCommandText;
-        var param = command.Parameters.Add("artcode", SqlDbType.Int);
-        param.Value = scan.ArtCode;
-        param = command.Parameters.Add("id_gamma", SqlDbType.Int);
-        param.Value = GlobalArea.CurrentEmployee.GammaID;
-        param = command.Parameters.Add("qty", SqlDbType.Int);
-        param.Value = scan.Qty;
+        command.Parameters.Add("artcode", SqlDbType.Int).Value = scan.ArtCode;
+        command.Parameters.Add("id_gamma", SqlDbType.Int).Value = GlobalArea.CurrentEmployee.GammaID;
+        command.Parameters.Add("qty", SqlDbType.Int).Value = scan.Qty;
+        command.Parameters.Add("EndDt", SqlDbType.NVarChar).Value = CurrentDateSQLStr;
         command.Transaction = tx;
         try
         {
@@ -368,7 +425,37 @@ namespace BarcodeFramework
                 yield return new Scan((int)reader.GetInt32(reader.GetOrdinal("artcode")),
                                       (int)reader.GetInt32(reader.GetOrdinal("id_gamma")),
                                       (int)reader.GetInt32(reader.GetOrdinal("qty"))) 
-                                      { Dt = reader.GetDateTime(reader.GetOrdinal("dt"))};
+                                      { Dt = reader.GetDateTime(reader.GetOrdinal("dt")),
+                                        StartDt = reader.GetString(reader.GetOrdinal("StartDt")),
+                                        EndDt = reader.GetString(reader.GetOrdinal("EndDt")),
+                                      };
+              }
+            }
+          }
+        }
+      }
+    }
+    public IEnumerable<ScanLog> GetAllScansLog()
+    {
+      Scan scan = null;
+      string selectCommand = @" SELECT * FROM ScanLog ";
+      using (SqlCeConnection connect = new SqlCeConnection(Datasource))
+      {
+        connect.Open();
+        using (SqlCeCommand command = new SqlCeCommand(selectCommand, connect))
+        {
+          using (SqlCeDataReader reader = command.ExecuteReader())
+          {
+            if (reader != null)
+            {
+              while (reader.Read())
+              {
+                yield return new ScanLog((int)reader.GetInt32(reader.GetOrdinal("artcode")),
+                                      (int)reader.GetInt32(reader.GetOrdinal("id_gamma")),
+                                      (int)reader.GetInt32(reader.GetOrdinal("Qty")),
+                                      (string)reader.GetString(reader.GetOrdinal("Dt")),
+                                      (string)reader.GetString(reader.GetOrdinal("Barcode")),
+                                      (AType)(int)reader.GetSqlInt32(reader.GetOrdinal("ActionType")));
               }
             }
           }
@@ -397,6 +484,7 @@ namespace BarcodeFramework
                                        GlobalArea.DbInfo.PereuchetDate.Day.ToString("00"),
                                        GlobalArea.DeviceInfo.DeviceID,
                                        GlobalArea.DeviceInfo.HostName));
+            sw.WriteLine("#Scan");
             foreach (var item in GetAllScans())
             {
                 sw.WriteLine(string.Format("{1}{0}{2}{0}{3}{0}{4}", 
@@ -404,7 +492,20 @@ namespace BarcodeFramework
                                             item.GammaID,
                                             item.ArtCode,
                                             item.Qty,
-                                            item.Dt.ToUniversalTime().ToString()));
+                                            item.EndDt));
+            }
+            sw.WriteLine("#ScanLog");
+            foreach (var item in GetAllScansLog())
+            {
+              sw.WriteLine(string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}{6}",
+                                          '|',
+                                          item.GammaID,
+                                          item.ArtCode,
+                                          item.Dt,
+                                          item.Qty,
+                                          item.Barcode,
+                                          item.ActTypeStr
+                                          ));
             }
             
           }

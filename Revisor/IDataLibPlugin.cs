@@ -35,7 +35,10 @@ namespace BarcodeFramework
     ScanInfo GetScanInfo(int IdGamma);
     // возвращает список пользователей
     IEnumerable<Employee> GetEmployees();
+    IEnumerable<ScanLog> GetAllScansLog();
     // Ищет в БД штрих-код пропуска сотрудника и возвращает объект Employee (сотркджник)
     Employee GetEmployee(string barcode);
+    //сохраняет лог
+    void SaveLog(ref ScanLog slog);
   }
 }

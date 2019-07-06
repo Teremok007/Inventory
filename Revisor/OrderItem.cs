@@ -11,6 +11,7 @@ namespace BarcodeFramework
   {
 
     public Scan Scan {get; set;}
+    public ScanLog ScanLog{get; set; }
     public Guid Id { get; set; }
     public Guid HeadId { get; set; }
     public DateTime DateCreated { get; set; }
@@ -25,6 +26,7 @@ namespace BarcodeFramework
       set
       {
         Scan.Qty = value;
+        ScanLog.Qty = value;
         if ((AddedMore != null) && (Scan.Qty > this.Ean.ControlQty) && GlobalArea.AppOption.IsMoreQtyMessage)
           AddedMore("Количество больше расчетного.");
       }
@@ -36,7 +38,12 @@ namespace BarcodeFramework
       this.Ean = ean;
       this.Scan = scan;
       this.Id = Guid.NewGuid();
-      this.DateCreated = DateTime.Now;      
+      this.DateCreated = DateTime.Now;
+      this.ScanLog = new ScanLog(ean.ArtCode,
+                                 GlobalArea.CurrentEmployee.GammaID,
+                                 scan.Qty,
+                                 GlobalArea.CurrentDateSQLStr, 
+                                 ean.Ean13);
     }
 
     public OrderItem AddOne()

@@ -153,7 +153,7 @@
       // 
       this.tbQty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.tbQty.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Bold);
-      this.tbQty.Location = new System.Drawing.Point(112, 182);
+      this.tbQty.Location = new System.Drawing.Point(112, 184);
       this.tbQty.Name = "tbQty";
       this.tbQty.Size = new System.Drawing.Size(113, 35);
       this.tbQty.TabIndex = 9;
@@ -176,7 +176,7 @@
       this.Controls.Add(this.edtName);
       this.Controls.Add(this.panel1);
       this.Name = "EditOrderItem";
-      this.Text = "EditOrderItem";
+      this.Text = "Редактирование";
       this.panel1.ResumeLayout(false);
       this.ResumeLayout(false);
 
