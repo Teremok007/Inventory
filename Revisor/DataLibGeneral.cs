@@ -404,7 +404,8 @@ namespace BarcodeFramework
                                             item.GammaID,
                                             item.ArtCode,
                                             item.Qty,
-                                            item.Dt.ToUniversalTime().ToString()));
+                                            item.Dt.Year.ToString() + "-" + item.Dt.Month.ToString("00") + "-" + item.Dt.Day.ToString("00") + " " + item.Dt.Hour.ToString("00") + ":" + item.Dt.Minute.ToString("00") + ":" + item.Dt.Second.ToString("00")
+                                            ));
             }
             
           }

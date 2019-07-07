@@ -98,6 +98,7 @@
     </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data.SqlClient, Version=3.0.3600.0, Culture=neutral, PublicKeyToken=3be235df1c8d2ad3, processorArchitecture=MSIL" />
+    <Reference Include="System.Data.SQLite, Version=1.0.66.0, Culture=neutral, PublicKeyToken=1fdb50b1b62b4c84, processorArchitecture=MSIL" />
     <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=3be235df1c8d2ad3, processorArchitecture=MSIL" />
     <Reference Include="System.Drawing">
       <Name>System.Drawing</Name>
@@ -122,6 +123,7 @@
     <Compile Include="DataLibGeneral.cs" />
     <Compile Include="DataLibPluginCeDB.cs" />
     <Compile Include="DataLibPluginXML.cs" />
+    <Compile Include="DataLibSQLite3.cs" />
     <Compile Include="DbInfo.cs" />
     <Compile Include="DeviceInfo.cs" />
     <Compile Include="EditOrderItem.cs">
@@ -209,9 +211,18 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icons8-barcode-reader-32_white.ico" />
+    <Content Include="SQLite.Interop.066.DLL">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
+    <Content Include="Data\scandb.s3db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLite.Interop.066.lib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>
