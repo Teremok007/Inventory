@@ -158,7 +158,7 @@
       // lblKoef
       // 
       this.lblKoef.Font = new System.Drawing.Font("Tahoma", 14F, System.Drawing.FontStyle.Bold);
-      this.lblKoef.Location = new System.Drawing.Point(55, 189);
+      this.lblKoef.Location = new System.Drawing.Point(55, 191);
       this.lblKoef.Name = "lblKoef";
       this.lblKoef.Size = new System.Drawing.Size(60, 20);
       this.lblKoef.Text = "8888";

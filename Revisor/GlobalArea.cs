@@ -22,5 +22,19 @@ namespace BarcodeFramework
           return dbInfo;
         }
     }
+    public static string CurrentDateSQLStr
+    {
+      get
+      {
+        DateTime dt = DateTime.Now;
+        return string.Format("{0}-{1}-{2} {3}:{4}:{5}",
+                      dt.Year.ToString(),
+                      dt.Month.ToString("00"),
+                      dt.Day.ToString("00"),
+                      dt.Hour.ToString("00"),
+                      dt.Minute.ToString("00"),
+                      dt.Second.ToString("00"));
+      }
+    }
   }
 }

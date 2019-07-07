@@ -53,7 +53,7 @@ namespace BarcodeFramework
     {      
       try
       {
-        var plug = GlobalArea.PluginManager.GetActivePlugin();
+        var plug = GlobalArea.PluginManager.GetActivePlugin();        
         if (plug == null)
         {
           MessageBox.Show("Не указан модуль работы с БД", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);          
@@ -61,6 +61,10 @@ namespace BarcodeFramework
         if (!plug.ConnectDatabase())
         {
           MessageBox.Show("Ошибка проверки подключения к БД.\n", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+        }
+        if (plug.GetDbInfo().Version.CompareTo("2.0.1") != 0)
+        {
+          MessageBox.Show("Версия БД " + plug.GetDbInfo().Version + " необходима " + "2.0.1","Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
         }
         else
         {

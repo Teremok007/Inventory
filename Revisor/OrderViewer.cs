@@ -52,7 +52,8 @@ namespace BarcodeFramework
       }
     }
     //private Order order;
-    private OrderItem lastOrderItem { 
+    private OrderItem lastOrderItem {
+      get { return data.GetOrdeItemByBarcode(lbBarcode.Text); }
       set 
       {
         if (value == null)
@@ -137,6 +138,7 @@ namespace BarcodeFramework
         RefreshStatusBar();
         return;
       }
+      item.ScanLog.ActType = AType.Edit;
       using(EditOrderItem editForm = new EditOrderItem(item))
       {
         if (editForm.ShowDialog() == DialogResult.OK)
@@ -179,6 +181,7 @@ namespace BarcodeFramework
             if (GlobalArea.AppOption.FastScan)
             {
               item.Qty += ((GlobalArea.AppOption.MultypleQtyType == MultipleQty.BY_PACKAGE) ? item.Ean.Koef : 1);
+              item.ScanLog.ActType = AType.Update;
               var t_itm = data.Save(ref item);
               lastOrderItem = t_itm;
               if (t_itm == null)
@@ -207,6 +210,7 @@ namespace BarcodeFramework
                 if ((editQty.ShowDialog() == DialogResult.OK) && (editQty.Qty != 0))
                 {
                   item.Qty += editQty.Qty;
+                  item.ScanLog.ActType = AType.Update;
                   lastOrderItem = data.Save(ref item);
                 }
               }
@@ -303,6 +307,11 @@ namespace BarcodeFramework
       if ((e.KeyCode == Keys.Return) && (handyBarcode.Length > 0))
       {
         DoScan(handyBarcode.ToString());
+        e.Handled = true;
+      }
+      if ((e.KeyCode == Keys.Return) && (handyBarcode.Length == 0) && (lbBarcode.Text.Length != 0))
+      {
+        EditingData(lbBarcode.Text);
         e.Handled = true;
       }
     }

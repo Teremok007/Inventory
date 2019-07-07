@@ -10,6 +10,8 @@ namespace BarcodeFramework
     public int Qty { get; set; }
     public int GammaID { get; set; }
     public DateTime Dt { get; set; }
+    public string StartDt { get; set; }
+    public string EndDt { get; set; }
 
     public Scan(int artcode,  int gammaid, int qty)
     {
