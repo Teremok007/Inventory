@@ -45,7 +45,7 @@ namespace BarcodeFramework
     {
       if (activePlugin == null)
       {
-        activePlugin = new DataLibPluginCeDB();
+        activePlugin = new DataLibSQLite3();
         activePlugin.Datasource = "scandb";
       }
       return activePlugin;

@@ -211,8 +211,8 @@
       this.barcoder.Config.ReaderParameters.ReaderSpecific.LaserSpecific.RasterHeight = -1;
       this.barcoder.Config.ReaderParameters.ReaderSpecific.LaserSpecific.RasterMode = Symbol.Barcode2.Design.RASTER_MODE.RASTER_MODE_DEFAULT;
       this.barcoder.Config.ReaderParameters.ReaderSpecific.LaserSpecific.ScanLedLogicLevel = Symbol.Barcode2.Design.DisabledEnabled.Default;
-      this.barcoder.Config.ScanParameters.BeepFrequency = 2670;
-      this.barcoder.Config.ScanParameters.BeepTime = 200;
+      this.barcoder.Config.ScanParameters.BeepFrequency = 1000;
+      this.barcoder.Config.ScanParameters.BeepTime = 100;
       this.barcoder.Config.ScanParameters.CodeIdType = Symbol.Barcode2.Design.CodeIdTypes.Default;
       this.barcoder.Config.ScanParameters.LedTime = 3000;
       this.barcoder.Config.ScanParameters.ScanType = Symbol.Barcode2.Design.SCANTYPES.Default;

@@ -6,5 +6,6 @@ namespace BarcodeFramework
 {
   class DataLibPluginCeDB : DataLibGeneral
   {
+
   }
 }

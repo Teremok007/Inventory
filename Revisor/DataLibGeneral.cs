@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlServerCe;
 using System.Collections.Generic;
 using System.Text;
@@ -53,20 +54,20 @@ namespace BarcodeFramework
         return true;
       }
     }
-    private string CurrentDateSQLStr
-    {
-      get
-      {
-        DateTime dt = DateTime.Now;
-        return string.Format("{0}-{1}-{2} {3}:{4}:{5}",
-                      dt.Year.ToString(),
-                      dt.Month.ToString("00"),
-                      dt.Day.ToString("00"),
-                      dt.Hour.ToString("00"),
-                      dt.Minute.ToString("00"),
-                      dt.Second.ToString("00"));
-      }
-    }
+    //private string CurrentDateSQLStr
+    //{
+    //  get
+    //  {
+    //    DateTime dt = DateTime.Now;
+    //    return string.Format("{0}-{1}-{2} {3}:{4}:{5}",
+    //                  dt.Year.ToString(),
+    //                  dt.Month.ToString("00"),
+    //                  dt.Day.ToString("00"),
+    //                  dt.Hour.ToString("00"),
+    //                  dt.Minute.ToString("00"),
+    //                  dt.Second.ToString("00"));
+    //  }
+    //}
     private bool ConnectDatabaseTry()
     {
       try
@@ -210,8 +211,8 @@ VALUES(@artcode, @id_gamma, @qty, GETDATE(), @StartDt, @EndDt) ";
         command.Parameters.Add("artcode", SqlDbType.Int).Value = ean.ArtCode;
         command.Parameters.Add("id_gamma", SqlDbType.Int).Value = GlobalArea.CurrentEmployee.GammaID;
         command.Parameters.Add("qty", SqlDbType.Int).Value = 0;
-        command.Parameters.Add("StartDt", SqlDbType.NVarChar).Value = CurrentDateSQLStr;
-        command.Parameters.Add("EndDt", SqlDbType.NVarChar).Value = CurrentDateSQLStr;
+        command.Parameters.Add("StartDt", SqlDbType.NVarChar).Value = GlobalArea.CurrentDateSQLStr;
+        command.Parameters.Add("EndDt", SqlDbType.NVarChar).Value = GlobalArea.CurrentDateSQLStr;
         command.Transaction = tx;
         try
         {
@@ -255,7 +256,7 @@ VALUES(@artcode, @id_gamma, @qty, GETDATE(), @StartDt, @EndDt) ";
         command.Parameters.Add("artcode", SqlDbType.Int).Value = scan.ArtCode;
         command.Parameters.Add("id_gamma", SqlDbType.Int).Value = GlobalArea.CurrentEmployee.GammaID;
         command.Parameters.Add("qty", SqlDbType.Int).Value = scan.Qty;
-        command.Parameters.Add("EndDt", SqlDbType.NVarChar).Value = CurrentDateSQLStr;
+        command.Parameters.Add("EndDt", SqlDbType.NVarChar).Value = GlobalArea.CurrentDateSQLStr;
         command.Transaction = tx;
         try
         {
@@ -492,10 +493,6 @@ VALUES(@artcode, @id_gamma, @qty, GETDATE(), @StartDt, @EndDt) ";
                                             item.GammaID,
                                             item.ArtCode,
                                             item.Qty,
-<<<<<<< HEAD
-                                            item.Dt.Year.ToString() + "-" + item.Dt.Month.ToString("00") + "-" + item.Dt.Day.ToString("00") + " " + item.Dt.Hour.ToString("00") + ":" + item.Dt.Minute.ToString("00") + ":" + item.Dt.Second.ToString("00")
-                                            ));
-=======
                                             item.EndDt));
             }
             sw.WriteLine("#ScanLog");
@@ -510,7 +507,6 @@ VALUES(@artcode, @id_gamma, @qty, GETDATE(), @StartDt, @EndDt) ";
                                           item.Barcode,
                                           item.ActTypeStr
                                           ));
->>>>>>> 3b985d49243fb509efd1c6bef0e3c913d5df0c94
             }
             
           }
