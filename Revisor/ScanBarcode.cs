@@ -10,7 +10,7 @@ namespace BarcodeFramework
     public static bool DBIsReady = false;
     public static void Main()
     {
-
+      
       InitializeApp();
       //MainMenu mainMenu = new MainMenu();
       //Application.Run(mainMenu);
