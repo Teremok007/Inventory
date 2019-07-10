@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace BarcodeFramework
 {
-  public class DataLibPluginXML : IDataLibPlugin
+  public class DataLibPluginXML
   {     
     private static string DBPath { get { return System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase); } }
     private static string OrdersFile = "ScanOrders";

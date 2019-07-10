@@ -31,12 +31,16 @@ namespace BarcodeFramework
         RefreshScanTypeLabel();
       }
     }
+    //форма для ввода количества при сканировании препарата
+    EditQty editQty = new EditQty();
+    // форма для редактирования количества препаратов
+    EditOrderItem editForm = new EditOrderItem(null);
 
     private void RefreshScanTypeLabel()
     {
       lblPieceScanType.Font = new System.Drawing.Font("Tahoma", 10F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold))));
       lblPackageScanType.Font = new System.Drawing.Font("Tahoma", 10F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold))));
-
+      lbPackageFlag.Font = new System.Drawing.Font("Tahoma", 10F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold))));   
       lblPieceScanType.ForeColor = Color.Gray;
       lblPackageScanType.ForeColor = Color.Gray;
       switch (GlobalArea.AppOption.MultypleQtyType)
@@ -48,6 +52,17 @@ namespace BarcodeFramework
         case MultipleQty.BY_PIECE:
           lblPieceScanType.ForeColor = Color.IndianRed;
           lblPieceScanType.Font = new System.Drawing.Font("Tahoma", 10F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))));
+          break;
+      }
+
+      
+      switch (GlobalArea.AppOption.FastScan)
+      {
+        case true:
+          lbPackageFlag.ForeColor = Color.IndianRed;
+          break;
+        case false:
+          lbPackageFlag.ForeColor = Color.Gray;
           break;
       }
     }
@@ -139,8 +154,10 @@ namespace BarcodeFramework
         return;
       }
       item.ScanLog.ActType = AType.Edit;
-      using(EditOrderItem editForm = new EditOrderItem(item))
+      //using(EditOrderItem editForm = new EditOrderItem(item))
+      if (editForm != null)
       {
+        editForm.OItem = item;
         if (editForm.ShowDialog() == DialogResult.OK)
         {
           data.Save(ref item);
@@ -160,15 +177,22 @@ namespace BarcodeFramework
           //если в сканированых не  нашли тогда ищем в БД          
           statusBar1.Text = "Поиск " + barcode + " в БД...";
           statusBar1.Refresh();
-          item = data.GetOrdeItemByBarcode(barcode);
+          //item = data.GetOrdeItemByBarcode(barcode);
+          Ean ean = data.GetEan(barcode);
+          if (ean != null)
+          {
+            statusBar1.Text = "Найдено: " + ean.ArtCode.ToString();
+            statusBar1.Refresh();
+          }
+          item = (ean != null) ? data.GetOrderItemByEan(ean) : null;
           // запись не создана тогда создадим её
           if (item == null)
           {
-            item = data.CreateOrderItemByBarcode(barcode);
-            //если ШК не найден то выход
-            
-          }
+            //item = data.CreateOrderItemByBarcode(barcode);
+            item = (ean != null) ? data.CreateOrderItem(ean) : null;
 
+          }
+          //если ШК не найден то выход
           if (item == null)
           {
             statusBar1.Text = "ШК " + barcode + " не найден.";
@@ -189,7 +213,7 @@ namespace BarcodeFramework
                 MessageBox.Show("Позиция не добавлена", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1);
               }
             }
-            else using (EditQty editQty = new EditQty())
+            else //using (EditQty editQty = new EditQty())
               {
                 editQty.Text = "Ввод количества | " + barcode;
                 editQty.Ean13 = barcode;
@@ -207,6 +231,7 @@ namespace BarcodeFramework
                   editQty.tbQty.Focus();
                   editQty.tbQty.SelectAll();
                 }
+                editQty.RefreshFont();
                 if ((editQty.ShowDialog() == DialogResult.OK) && (editQty.Qty != 0))
                 {
                   item.Qty += editQty.Qty;
@@ -388,7 +413,6 @@ namespace BarcodeFramework
     private void ClearFields()
     {
       lblDetails.Text = "";
-//      lbManufacturer.Text = "";
       lbQty.Text = "";
       lblKoef.Text = "";
       lbControlQty.Text = "";
@@ -473,13 +497,18 @@ namespace BarcodeFramework
     private void lbEmployerName_Click(object sender, EventArgs e)
     {
       barcoder.EnableScanner = false;
+      int _oldUserGammaId = GlobalArea.CurrentEmployee.GammaID;
       try
-      {
+      {        
         using (AuthorisationForm auth = new AuthorisationForm())
         {
           if (auth.ShowDialog() == DialogResult.OK)
           {
             lbEmployerName.Text = (GlobalArea.CurrentEmployee != null) ? GlobalArea.CurrentEmployee.Name : "";
+            if (_oldUserGammaId != GlobalArea.CurrentEmployee.GammaID)
+            {
+              lastOrderItem = null;              
+            }
           }
         }
       }

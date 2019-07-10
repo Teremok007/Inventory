@@ -29,6 +29,8 @@ namespace BarcodeFramework
     OrderItem GetOrderItemByEan(Ean ean);
     // Создает объект OrderItem по заданному штрих-коду
     OrderItem CreateOrderItemByBarcode(string barcode);
+    // Создает объект OrderItem по данным препарата
+    OrderItem CreateOrderItem(Ean ean);
     // возварщает объект OrderItem по заданному штрих-коду
     OrderItem GetOrdeItemByBarcode(string barcode);
     // возвращает о скнировании (Арт-код и кол-во сканированного товара)

@@ -19,11 +19,18 @@ namespace BarcodeFramework
       public int Nds { get; set; }
       public string Manufacturer { get; set; }
 
-      public string ToString() 
+      public override string ToString() 
       {
         if (view == null)
         {
-          return string.Format("{0}\t{1}\t{2}\t{3}", this.ArtCode, this.Ean13, this.Name);
+          return string.Format(@"Ean\{ ArtCode={0}; Ean13={1}; Name={2}; Koef={3}; ControlQty={4}; Nds={5}; Manufacturer={6}\}", 
+                  this.ArtCode, 
+                  this.Ean13, 
+                  this.Name, 
+                  this.Koef,
+                  this.ControlQty,
+                  this.Nds,
+                  this.Manufacturer);
         }
         return view(this);
       }

@@ -22,5 +22,18 @@ namespace BarcodeFramework
     }
     public Scan(int artcode,int gammaid): this(artcode, gammaid, 0)
     { }
+
+    public override string ToString()
+    {
+      return string.Format(@"Scan\{ ArtCode = {0}; Qty={1}; GammaId={2}; Dt={3}; StartDt={4}; EndDt={5}\}",
+        this.ArtCode.ToString(), 
+        this.Qty.ToString(),
+        this.GammaID.ToString(),
+        this.Dt.ToShortDateString(),
+        this.StartDt,
+        this.EndDt
+        );
+    }
+
   }
 }

@@ -19,7 +19,7 @@ namespace BarcodeFramework
     public string DbName { get { return dbName; } set { dbName = value; } }
     public string Datasource
     {
-      get { return "Data Source='" + DBPath + "\\Data\\" + DbName + fileExtention + ";Version=3;"; }
+      get { return "Data Source=\"" + DBPath + "\\" + DbName + fileExtention + "\";Version=3;"; }
       set { dbName = value; }
     }
 
@@ -28,7 +28,11 @@ namespace BarcodeFramework
       get { return "SQLite3 Plugin"; }
     }
 
-    private SQLiteConnection GetConnect() { return new SQLiteConnection(Datasource); } 
+    private SQLiteConnection GetConnect() 
+    {
+      return new SQLiteConnection(Datasource);
+    } 
+
     public bool ConnectDatabase()
     {
       try
@@ -37,11 +41,13 @@ namespace BarcodeFramework
         {
           connection.Open();
           connection.Close();
+          GlobalArea.Logger.Info("Connect to DB SQLite3");
           return true;
         }
       }
-      catch (Exception)
+      catch (Exception ex)
       {
+        GlobalArea.Logger.Error("Exeption. ConnectDatabase." + ex.ToString() );
         return false;
       }
     }
@@ -62,6 +68,7 @@ VALUES(:ArtCode,
           
           using (SQLiteCommand cmd = new SQLiteCommand(queryStr, connect))
           {
+            cmd.CommandType = CommandType.Text;
             cmd.Parameters.Add("ArtCode", DbType.Int32).Value = orderItem.ArtCode;
             cmd.Parameters.Add("id_gamma", DbType.Int32).Value = GlobalArea.CurrentEmployee.GammaID;
             cmd.Parameters.Add("Qty", DbType.Int32).Value = orderItem.Qty;
@@ -73,9 +80,11 @@ VALUES(:ArtCode,
             {
               rowsAffected = cmd.ExecuteNonQuery();
               tx.Commit();
+              GlobalArea.Logger.Info("InsertOrReplace into Scan...");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+              GlobalArea.Logger.Error("Exception. InsertOrReplace rollback. " + ex.ToString());
               tx.Rollback();
             }
           }
@@ -93,14 +102,16 @@ VALUES(:ArtCode,
           if (slog != null)
             SaveLog(ref slog);
         }
-        catch (Exception)
-        { }
+        catch (Exception ex)
+        {
+          GlobalArea.Logger.Error("[exception]pOrderItem/Save/SaveLog] " + ex.ToString());
+        }
       return GetOrderItemByEan(orderItem.Ean);
     }
     // обновляет orderItem | возвращает количество затронутіх записей
     public int UpdateScan(Scan scan)
     {
-      string updateCommandText = @" UPDATE scan SET Qty = @qty, EndDt = @EndDt WHERE ArtCode = @artcode and id_gamma = @id_gamma ";
+      string updateCommandText = @" UPDATE scan SET Qty = :qty, EndDt = :EndDt WHERE ArtCode = :artcode and id_gamma = :id_gamma ";
       int rowsAffected = 0;
       using (var connect = GetConnect())
       {
@@ -119,9 +130,11 @@ VALUES(:ArtCode,
           {
             rowsAffected = command.ExecuteNonQuery();
             tx.Commit();
+            GlobalArea.Logger.Info("Commit UpdateScan");
           }
-          catch (Exception)
+          catch (Exception ex)
           {
+            GlobalArea.Logger.Error("Exception. Rollback updateScan." + ex.ToString());
             tx.Rollback();
             return 0;
           }
@@ -177,8 +190,12 @@ VALUES(:ArtCode,
           }
         }
       }
-      catch (Exception e) { MessageBox.Show(e.Message, "Ошибка єкспорта в файл fileName", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1); }
-      return 0;    
+      catch (Exception e)
+      { 
+        MessageBox.Show(e.Message, "Ошибка єкспорта в файл fileName", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+        GlobalArea.Logger.Error("[Exception][Export error.] " + e.ToString());
+      }
+        return 0;    
     }
 
     public Ean GetEan(string barcode)
@@ -187,8 +204,8 @@ VALUES(:ArtCode,
       string commandText = @" SELECT s.artcode, s.ean13, s.names, s.koef,  IFNULL(p.qty,0) qty, s.nds, s.Manufacturer
     FROM sprean s
     LEFT OUTER JOIN pereuchet p ON s.artcode = p.artcode 
-    WHERE s.ean13 = @barcode
-    ORDER BY (CASE WHEN p.qty IS NULL THEN 0 ELSE p.qty END) DESC, s.artcode desc  ";
+    WHERE s.ean13 = :barcode
+    ORDER BY IFNULL(p.qty,0) DESC, s.artcode desc";
       using (var connect = GetConnect())
       {
         connect.Open();
@@ -199,7 +216,7 @@ VALUES(:ArtCode,
           command.Parameters.Add("barcode", DbType.String).Value = barcode;
           using (SQLiteDataReader res = command.ExecuteReader())
           {
-            if (res.Read())
+            if (res.HasRows && res.Read())
             {
               ean = new Ean();
               ean.ArtCode = res.GetInt32(0);
@@ -226,7 +243,7 @@ VALUES(:ArtCode,
         {
           command.CommandText = commandString;
           command.CommandType = CommandType.Text;
-          return (int)command.ExecuteScalar();
+          return int.Parse(command.ExecuteScalar().ToString());
         }
       }
     }
@@ -243,7 +260,7 @@ VALUES(:ArtCode,
         {
           command.CommandText = commandText;
           using (SQLiteDataReader res = command.ExecuteReader())
-          {
+          {            
             while (res.Read())
             {
                 switch (res.GetString(0).ToUpper())
@@ -298,7 +315,7 @@ VALUES(:ArtCode,
     {
       OrderItem orderItem = null;
       string insertCommandText = @" INSERT INTO scan(ArtCode, id_gamma, Qty, Dt, StartDt, EndDt) 
-VALUES(@artcode, @id_gamma, @qty, GETDATE(), @StartDt, @EndDt) ";
+VALUES(@artcode, @id_gamma, @qty,  datetime('now'), @StartDt, @EndDt) ";
       using (var connect = GetConnect())
       {
         connect.Open();
@@ -316,10 +333,12 @@ VALUES(@artcode, @id_gamma, @qty, GETDATE(), @StartDt, @EndDt) ";
           {
             int rowsAffected = command.ExecuteNonQuery();
             tx.Commit();
+            GlobalArea.Logger.Info("Insert into Scan table success.");
             orderItem = GetOrderItemByEan(ean);
           }
           catch (Exception e)
           {
+            GlobalArea.Logger.Error("[Exception][Rollback inserting into Scan table.] " + e.ToString());
             MessageBox.Show(e.Message);
             tx.Rollback();
             orderItem = null;
@@ -349,17 +368,18 @@ VALUES(@artcode, @id_gamma, @qty, GETDATE(), @StartDt, @EndDt) ";
       string SumQtyCommand = @" SELECT SUM(Qty) FROM scan WHERE id_gamma = " + GlobalArea.CurrentEmployee.GammaID.ToString();
       using (var connect = GetConnect())
       {
+        connect.Open();
         using (var command = connect.CreateCommand())
-        {
-          connect.Open();
+        {          
           command.CommandText = countCommand;
           command.CommandType = CommandType.Text;
-          int count = (int)command.ExecuteScalar();
+          var val = command.ExecuteScalar().ToString();
+          int count = int.Parse(command.ExecuteScalar().ToString());
           int sumQty = 0;
           if (count > 0)
           {
             command.CommandText = SumQtyCommand;
-            sumQty = (int)command.ExecuteScalar();
+            sumQty = int.Parse(command.ExecuteScalar().ToString());
           }
           scanInfo = new ScanInfo() { Count = count, SumQty = sumQty };
         }
@@ -373,22 +393,24 @@ VALUES(@artcode, @id_gamma, @qty, GETDATE(), @StartDt, @EndDt) ";
       using (var connect = GetConnect())
       {
         connect.Open();
-        using (var command = new SQLiteCommand(selectCommand, connect))
-        {
+        using (var command = connect.CreateCommand())
+        {          
+          command.CommandText = selectCommand;
+          command.CommandType = CommandType.Text;
           using (SQLiteDataReader reader = command.ExecuteReader())
           {
-            if (reader != null)
+            if (reader.HasRows)
             {
               try
               {
                 while (reader.Read())
                 {
-                  yield return new Employee()
-                  {
-                    GammaID = (int)reader.GetInt32(reader.GetOrdinal("id_gamma")),
-                    Barcode = (reader.IsDBNull(reader.GetOrdinal("barcode"))) ? "" : reader.GetString(reader.GetOrdinal("barcode")),
-                    Name = reader.GetString(reader.GetOrdinal("ename"))
-                  };
+                  var emp = new Employee();
+                  if (!reader.IsDBNull(0))
+                    emp.GammaID = int.Parse(reader.GetValue(0).ToString());
+                  emp.Name = reader.GetString(1);
+                  emp.Barcode = (reader.IsDBNull(2)) ? "" : reader.GetString(2);
+                  yield return emp;
                 }
               }
               finally
@@ -405,7 +427,7 @@ VALUES(@artcode, @id_gamma, @qty, GETDATE(), @StartDt, @EndDt) ";
     public Employee GetEmployee(string barcode)
     {
       Employee emp = null;
-      string selectCommand = @" SELECT CONVERT(INT,id_gamma) id_gamma, ename, case when barcode is not null then barcode else '' END barcode FROM Employee WHERE barcode IS NOT NULL AND barcode = CONVERT(NVARCHAR(12), @barcode) ";
+      string selectCommand = @" SELECT CONVERT(INT,id_gamma) AS id_gamma, ename, case when barcode is not null then barcode else '' END barcode FROM Employee WHERE barcode IS NOT NULL AND barcode = CONVERT(NVARCHAR(12), @barcode) ";
       using (var connect = GetConnect())
       {
         connect.Open();
@@ -431,6 +453,7 @@ VALUES(@artcode, @id_gamma, @qty, GETDATE(), @StartDt, @EndDt) ";
 
     public Scan GetScan(int artcode)
     {
+      GlobalArea.Logger.Info("GetScan artcode = {0}", artcode);
       Scan scan = null;
       string selectCommand = @" SELECT artcode, id_gamma, qty FROM scan WHERE artcode = @artcode and id_gamma = @id_gamma";
       using (var connect = GetConnect())
@@ -451,22 +474,23 @@ VALUES(@artcode, @id_gamma, @qty, GETDATE(), @StartDt, @EndDt) ";
             }
           }
         }
+        GlobalArea.Logger.Info("GetScan artcode = {0}", artcode);
         return scan;
       }
     }
 
     public IEnumerable<ScanLog> GetAllScansLog()
-    {
-      Scan scan = null;
+    {     
       string selectCommand = @" SELECT * FROM ScanLog ";
       using (var connect = GetConnect())
       {
         connect.Open();
         using (var command = new SQLiteCommand(selectCommand, connect))
         {
+          command.CommandType = CommandType.Text;
           using (SQLiteDataReader reader = command.ExecuteReader())
           {
-            if (reader != null)
+            if (reader.HasRows)
             {
               while (reader.Read())
               {
@@ -506,9 +530,11 @@ VALUES(@artcode, @id_gamma, @Dt, @Qty, @Barcode, @ActionType) ";
         {
           int rowsAffected = command.ExecuteNonQuery();
           tx.Commit();
+          GlobalArea.Logger.Info("Commit inserting into ScanLog table.");
         }
         catch (Exception e)
         {
+          GlobalArea.Logger.Error("[Exception][Rollback inserting into ScanLog table.] " + e.ToString());
           MessageBox.Show(e.Message);
           tx.Rollback();
         }

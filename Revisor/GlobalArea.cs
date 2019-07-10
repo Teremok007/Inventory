@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using NLog;
+using NLog.Config;
 
 namespace BarcodeFramework
 {
@@ -11,6 +13,7 @@ namespace BarcodeFramework
     public static AppOption AppOption = new AppOption();
     public static DeviceInfo DeviceInfo = new DeviceInfo();
     public static Employee CurrentEmployee { get; set; }
+    public static NLog.Logger Logger = NLog.LogManager.GetLogger("ScanBarcodeLogger");
 
     private static DbInfo dbInfo;
     public static DbInfo DbInfo 

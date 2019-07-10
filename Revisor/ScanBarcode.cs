@@ -32,7 +32,8 @@ namespace BarcodeFramework
       }
       catch (Exception e)
       {
-        MessageBox.Show(e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+        GlobalArea.Logger.Error("[Error][Ошибка чтения таблицы Сотрудников] " + e.ToString());
+        throw;
       }
     }
     
@@ -58,23 +59,21 @@ namespace BarcodeFramework
         {
           MessageBox.Show("Не указан модуль работы с БД", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);          
         }
+        GlobalArea.Logger.Info("Try to connect DB. " + plug.PluginFullName + " Datasource " + plug.Datasource);
         if (!plug.ConnectDatabase())
         {
+          GlobalArea.Logger.Info("[Connect to DB is failed.] "  + plug.PluginFullName + " Datasource " + plug.Datasource);
           MessageBox.Show("Ошибка проверки подключения к БД.\n", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
         }
-        if (plug.GetDbInfo().Version.CompareTo("2.0.1") != 0)
-        {
-          MessageBox.Show("Версия БД " + plug.GetDbInfo().Version + " необходима " + "2.0.1","Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
-        }
-        else
-        {
-          DBIsReady = true;
-        }
+        
+        DBIsReady = true;   
         //GlobalArea.PluginManager.GetActivePlugin().ConnectDatabase();
       }
       catch(Exception ex)
       {
-        MessageBox.Show("Ошибка проверки подключения к БД.\n"+ ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+        GlobalArea.Logger.Error("[Exception][Ошибка проверки подключения к БД.] " + ex.ToString());
+        DBIsReady = false;
+        throw;
       }
     }
     public static void DeInitializeApp()

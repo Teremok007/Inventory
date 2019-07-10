@@ -286,8 +286,7 @@ VALUES(@artcode, @id_gamma, @qty, GETDATE(), @StartDt, @EndDt) ";
         using (SqlCeCommand command = connect.CreateCommand())
         {
           command.CommandText = commandText;
-          var param = command.Parameters.Add("barcode", SqlDbType.NVarChar);
-          param.Value = barcode;
+          command.Parameters.Add("barcode", SqlDbType.NVarChar).Value = barcode;
           using (SqlCeResultSet res = command.ExecuteResultSet(ResultSetOptions.Scrollable))
           {
             try

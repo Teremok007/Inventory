@@ -78,13 +78,14 @@
       // edtName
       // 
       this.edtName.BackColor = System.Drawing.SystemColors.ScrollBar;
-      this.edtName.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular);
+      this.edtName.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold);
       this.edtName.Location = new System.Drawing.Point(3, 2);
       this.edtName.Multiline = true;
       this.edtName.Name = "edtName";
       this.edtName.Size = new System.Drawing.Size(235, 131);
       this.edtName.TabIndex = 5;
       this.edtName.TabStop = false;
+      this.edtName.Text = "Съешь еще этих спелых и вкусных яблок";
       // 
       // label3
       // 
@@ -118,9 +119,9 @@
       // 
       this.lbNds.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.lbNds.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular);
-      this.lbNds.Location = new System.Drawing.Point(112, 166);
+      this.lbNds.Location = new System.Drawing.Point(45, 169);
       this.lbNds.Name = "lbNds";
-      this.lbNds.Size = new System.Drawing.Size(113, 18);
+      this.lbNds.Size = new System.Drawing.Size(61, 24);
       // 
       // label2
       // 

@@ -19,7 +19,7 @@ namespace BarcodeFramework
       set { tbQty.Text = value.ToString(); }
     }
     public OrderItem selectedItem;
-
+    
     public EditQty()
     {
       InitializeComponent();
@@ -37,9 +37,9 @@ namespace BarcodeFramework
       lbArtCode.Text    = selectedItem.ArtCode.ToString();
       lbNds.Text        = selectedItem.Ean.Nds.ToString() + "%";
       lblQtyInApt.Text = selectedItem.Ean.ControlQty.ToString();
-      //lbManufacturer.Text = selectedItem.Ean.Manufacturer;
       tbQty.Focus();
       tbQty.SelectAll();
+
     }
 
     private void EditQty_KeyPress(object sender, KeyPressEventArgs e)
@@ -82,6 +82,21 @@ namespace BarcodeFramework
     private void button1_Click(object sender, EventArgs e)
     {
 
+    }
+    public void RefreshFont()
+    {
+      lblName.Font = new System.Drawing.Font("Tahoma", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold))));
+      tbQty.Font = new System.Drawing.Font("Arial", 20F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Regular))));
+      label2.Font = new System.Drawing.Font("Tahoma", 10F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold))));
+      lbNds.Font = new System.Drawing.Font("Tahoma", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Regular))));
+      label3.Font = new System.Drawing.Font("Tahoma", 10F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold))));
+      lbScanedQty.Font = new System.Drawing.Font("Tahoma", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Regular))));
+      label5.Font = new System.Drawing.Font("Tahoma", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Regular))));
+      lblKoef.Font = new System.Drawing.Font("Tahoma", 14F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold))));
+      label1.Font = new System.Drawing.Font("Tahoma", 10F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Regular))));
+      lblQtyInApt.Font = new System.Drawing.Font("Tahoma", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Regular))));
+      lbBarcode.Font = new System.Drawing.Font("Tahoma", 11F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Regular))));
+      lbArtCode.Font = new System.Drawing.Font("Tahoma", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold))));
     }
 
   }
