@@ -33,31 +33,38 @@
       this.btOk = new System.Windows.Forms.Button();
       this.button2 = new System.Windows.Forms.Button();
       this.barcoder = new Symbol.Barcode2.Design.Barcode2();
+      this.label2 = new System.Windows.Forms.Label();
+      this.lbTime = new System.Windows.Forms.Label();
+      this.timer = new System.Windows.Forms.Timer();
+      this.lbDate = new System.Windows.Forms.Label();
+      this.lbError = new System.Windows.Forms.Label();
       this.SuspendLayout();
       // 
       // label1
       // 
       this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                   | System.Windows.Forms.AnchorStyles.Right)));
-      this.label1.Location = new System.Drawing.Point(14, 13);
+      this.label1.Location = new System.Drawing.Point(14, 64);
       this.label1.Name = "label1";
       this.label1.Size = new System.Drawing.Size(213, 20);
       this.label1.Text = "Выберите пользователя:";
+      this.label1.ParentChanged += new System.EventHandler(this.label1_ParentChanged);
       // 
       // cmbEmployees
       // 
       this.cmbEmployees.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                   | System.Windows.Forms.AnchorStyles.Right)));
-      this.cmbEmployees.Location = new System.Drawing.Point(14, 36);
+      this.cmbEmployees.Location = new System.Drawing.Point(14, 87);
       this.cmbEmployees.Name = "cmbEmployees";
       this.cmbEmployees.Size = new System.Drawing.Size(213, 23);
       this.cmbEmployees.TabIndex = 1;
+      this.cmbEmployees.SelectedIndexChanged += new System.EventHandler(this.cmbEmployees_SelectedIndexChanged_1);
       // 
       // btOk
       // 
       this.btOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.btOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btOk.Location = new System.Drawing.Point(14, 173);
+      this.btOk.Location = new System.Drawing.Point(14, 208);
       this.btOk.Name = "btOk";
       this.btOk.Size = new System.Drawing.Size(75, 31);
       this.btOk.TabIndex = 3;
@@ -68,7 +75,7 @@
       // 
       this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.button2.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.button2.Location = new System.Drawing.Point(152, 173);
+      this.button2.Location = new System.Drawing.Point(152, 208);
       this.button2.Name = "button2";
       this.button2.Size = new System.Drawing.Size(75, 31);
       this.button2.TabIndex = 4;
@@ -166,12 +173,62 @@
       this.barcoder.EnableScanner = false;
       this.barcoder.OnScan += new Symbol.Barcode2.Design.Barcode2.OnScanEventHandler(this.barcode_OnScan);
       // 
+      // label2
+      // 
+      this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                  | System.Windows.Forms.AnchorStyles.Right)));
+      this.label2.Font = new System.Drawing.Font("Tahoma", 10F, System.Drawing.FontStyle.Bold);
+      this.label2.Location = new System.Drawing.Point(14, 0);
+      this.label2.Name = "label2";
+      this.label2.Size = new System.Drawing.Size(213, 20);
+      this.label2.Text = "Проверьте дату и время";
+      // 
+      // lbTime
+      // 
+      this.lbTime.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                  | System.Windows.Forms.AnchorStyles.Right)));
+      this.lbTime.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold);
+      this.lbTime.ForeColor = System.Drawing.Color.Maroon;
+      this.lbTime.Location = new System.Drawing.Point(14, 40);
+      this.lbTime.Name = "lbTime";
+      this.lbTime.Size = new System.Drawing.Size(102, 20);
+      this.lbTime.Text = "16:38:59";
+      // 
+      // timer
+      // 
+      this.timer.Tick += new System.EventHandler(this.timer_Tick);
+      // 
+      // lbDate
+      // 
+      this.lbDate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                  | System.Windows.Forms.AnchorStyles.Right)));
+      this.lbDate.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold);
+      this.lbDate.ForeColor = System.Drawing.Color.Maroon;
+      this.lbDate.Location = new System.Drawing.Point(14, 20);
+      this.lbDate.Name = "lbDate";
+      this.lbDate.Size = new System.Drawing.Size(102, 20);
+      this.lbDate.Text = "17.07.2019";
+      // 
+      // lbError
+      // 
+      this.lbError.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular);
+      this.lbError.ForeColor = System.Drawing.Color.Red;
+      this.lbError.Location = new System.Drawing.Point(3, 127);
+      this.lbError.Name = "lbError";
+      this.lbError.Size = new System.Drawing.Size(232, 56);
+      this.lbError.Text = "Неверно установлена текущая  дата и/или время";
+      this.lbError.Visible = false;
+      // 
       // AuthorisationForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
       this.AutoScroll = true;
-      this.ClientSize = new System.Drawing.Size(238, 215);
+      this.ClientSize = new System.Drawing.Size(238, 250);
+      this.Controls.Add(this.lbError);
+      this.Controls.Add(this.lbDate);
+      this.Controls.Add(this.lbTime);
+      this.Controls.Add(this.label2);
       this.Controls.Add(this.button2);
       this.Controls.Add(this.btOk);
       this.Controls.Add(this.cmbEmployees);
@@ -179,6 +236,7 @@
       this.MinimizeBox = false;
       this.Name = "AuthorisationForm";
       this.Text = "Авторизация";
+      this.Deactivate += new System.EventHandler(this.AuthorisationForm_Deactivate);
       this.Activated += new System.EventHandler(this.AuthorisationForm_Activated);
       this.Closing += new System.ComponentModel.CancelEventHandler(this.AuthorisationForm_Closing);
       this.ResumeLayout(false);
@@ -192,5 +250,10 @@
     private System.Windows.Forms.Button btOk;
     private System.Windows.Forms.Button button2;
     private Symbol.Barcode2.Design.Barcode2 barcoder;
+    private System.Windows.Forms.Label label2;
+    private System.Windows.Forms.Label lbTime;
+    private System.Windows.Forms.Timer timer;
+    private System.Windows.Forms.Label lbDate;
+    private System.Windows.Forms.Label lbError;
   }
 }

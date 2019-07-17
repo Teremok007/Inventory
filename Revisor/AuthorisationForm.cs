@@ -40,19 +40,15 @@ namespace BarcodeFramework
       GlobalArea.CurrentEmployee = (Employee)this.cmbEmployees.SelectedItem;
     }
 
-    private void AuthorisationForm_Activated(object sender, EventArgs e)
-    {
-      barcoder.EnableScanner = true;
-    }
-
     private void button2_Click(object sender, EventArgs e)
     {
-      this.Close();
+      //this.Close();
     }
 
     private void AuthorisationForm_Closing(object sender, CancelEventArgs e)
     {
       barcoder.EnableScanner = false;
+      timer.Enabled = false;
     }
 
     private void barcode_OnScan(Symbol.Barcode2.ScanDataCollection scanDataCollection)
@@ -95,6 +91,37 @@ namespace BarcodeFramework
         }
       }
       cmbEmployees.Refresh();
+    }
+
+    private void label1_ParentChanged(object sender, EventArgs e)
+    {
+
+    }
+
+    private void cmbEmployees_SelectedIndexChanged_1(object sender, EventArgs e)
+    {
+
+    }
+
+    private void timer_Tick(object sender, EventArgs e)
+    {
+      DateTime dt = DateTime.Now;
+      lbDate.Text = string.Format(@"{0}.{1}.{2}", dt.Day.ToString("00"), dt.Month.ToString("00"), dt.Year);
+      lbTime.Text = string.Format(@"{0}:{1}:{2}", dt.Hour.ToString("00"), dt.Minute.ToString("00"), dt.Second.ToString("00"));
+    }
+
+    private void AuthorisationForm_Activated(object sender, EventArgs e)
+    {
+      barcoder.EnableScanner = true;
+      lbError.Visible = (GlobalArea.DbInfo.CreatedDBDt > DateTime.Now);
+      btOk.Enabled = !lbError.Visible;
+      timer.Enabled = true;
+
+    }
+
+    private void AuthorisationForm_Deactivate(object sender, EventArgs e)
+    {
+      barcoder.EnableScanner = false;
     }
   }
 }

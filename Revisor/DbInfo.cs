@@ -11,6 +11,8 @@ namespace BarcodeFramework
     public string AptekaName { get; set; }
     public string PereuchetDateText { get; set; }
     public DateTime PereuchetDate { get; set; }
+    private DateTime createDbDt = DateTime.Now;
+    public DateTime CreatedDBDt { get { return createDbDt; } set { createDbDt = value; } }
     public string SprEanRowCountText { get; set; }
     public string PereuchetRowCountText { get; set; }
   }

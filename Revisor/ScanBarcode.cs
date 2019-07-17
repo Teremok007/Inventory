@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
@@ -10,7 +11,8 @@ namespace BarcodeFramework
     public static bool DBIsReady = false;
     public static void Main()
     {
-      
+      //if (System.Diagnostics.Process.GetCurrentProcess(). GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ProcessName).Length > 1)
+//        return;
       InitializeApp();
       //MainMenu mainMenu = new MainMenu();
       //Application.Run(mainMenu);

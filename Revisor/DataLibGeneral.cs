@@ -392,6 +392,11 @@ VALUES(@artcode, @id_gamma, @qty, GETDATE(), @StartDt, @EndDt) ";
                     dbInfo.PereuchetDateText = dt.ToShortDateString();
                     dbInfo.PereuchetDate = dt;
                     break;
+                  case "DBCREATEDTIME":
+                    long CreatedDBTicks = long.Parse(res.GetString(1));
+                    var CreatedDbDt = new DateTime(CreatedDBTicks);
+                    dbInfo.CreatedDBDt = CreatedDbDt;
+                    break;
                   case "SPREANROWSCOUNT":
                     dbInfo.SprEanRowCountText = res.GetString(1);
                     break;
